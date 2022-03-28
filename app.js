@@ -1,29 +1,39 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const ejs = require('ejs');
 
 const app = express();
+app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(express.static("public"));
 
-
+let posts = [];
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/views/home.html");
+    res.render('home', {
+        posts: posts
+    });
 })
-app.get('/views/compose.html', function (req, res) {
-    res.sendFile(__dirname + "/views/compose.html")
+app.get('/compose', function (req, res) {
+    res.render("compose.ejs")
 })
-app.get('/views/home.html', function (req, res) {
-    res.sendFile(__dirname + "/views/home.html")
+app.get('/home', function (req, res) {
+    res.render("home.ejs")
 })
 
-app.post('/compose.html', function (req, res) {
-    console.log(req.body);
+app.post('/compose', function (req, res) {
+    const post = {
+        name: req.body.name,
+        text: req.body.text
+    };
+    posts.push(post);
     res.redirect('/');
 })
 
 
-app.listen(3000, function (req, res) {
+
+app.listen(3000, function () {
     console.log("Running on: 3000");
 })
