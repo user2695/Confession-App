@@ -11,8 +11,10 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/home">BlogPost</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/home"
+        ><b style="font-size: x-large">Confetti</b></a
+      >
       <button
         class="navbar-toggler"
         type="button"
@@ -33,7 +35,7 @@
             >
           </li>
         </ul>
-<form class="form-inline my-2 my-lg-0">
+        <form class="form-inline my-2 my-lg-0">
           <input
             class="form-control mr-sm-2"
             type="search"
@@ -49,17 +51,15 @@
   </head>
   <body>
     <form action="/compose" method="post">
-      <div class="form-group">
-        <label for="exampleFormControlInput1">Name</label>
-        <input
-          type="text"
-          class="form-control"
-          name="name"
-          placeholder="John Doe"
-        />
+      <div
+        class="form-group"
+        style="margin-top: 40px; margin-left: 200px; margin-right: 200px"
+      >
+        <label for="exampleFormControlInput1">Title</label>
+        <input type="text" class="form-control" name="postTitle" />
 
         <label for="exampleFormControlTextarea1">Example textarea</label>
-        <textarea class="form-control" name="text" rows="3"></textarea>
+        <textarea class="form-control" name="postBody" rows="3"></textarea>
         <input class="btn btn-primary" type="submit" value="Submit" />
       </div>
     </form>
