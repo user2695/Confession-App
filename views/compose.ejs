@@ -11,6 +11,7 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="/public/css/styles.css">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="/home"
         ><b style="font-size: x-large">Confetti</b></a
@@ -49,7 +50,7 @@
       </div>
     </nav>
   </head>
-  <body>
+  <body class="body" style="background-color:#F7CCAC">
     <form action="/compose" method="post">
       <div
         class="form-group"
@@ -58,7 +59,7 @@
         <label for="exampleFormControlInput1">Title</label>
         <input type="text" class="form-control" name="postTitle" />
 
-        <label for="exampleFormControlTextarea1">Example textarea</label>
+        <label for="exampleFormControlTextarea1">Text</label>
         <textarea class="form-control" name="postBody" rows="3"></textarea>
         <input class="btn btn-primary" type="submit" value="Submit" />
       </div>
