@@ -58,17 +58,31 @@ app.get("/blogs/:id", (req, res) => {
   );
 });
 
-app.put("/blogs/:id", (req, res) => {
-  var sql = "update blogs set title=?,content=? where id=?"[req.params.id];
+// app.put("/blogs/:id", (req, res) => {
+//   var sql = "update blogs set title=?,content=? where id=?";
+//   mysqlConnection.query(
+//     sql,
+
+//     function (err, rows, fields) {
+//       if (err) throw err;
+//       console.log("record inserted");
+//     }
+//   );
+//   res.send("Updated Successfully");
+// });
+
+app.put("/blogs", (req, res) => {
+  let blog = req.body;
+  var sql =
+    "SET @id = ?;SET @title = ?;SET @content = ?; CALL blogEdit(@id,@title,@content);";
   mysqlConnection.query(
     sql,
-    [req.body.title, req.body.content],
-    function (err, rows, fields) {
-      if (err) throw err;
-      console.log("record inserted");
+    [blog.id, blog.title, blog.content],
+    (err, rows, fields) => {
+      if (!err) res.send("Learner Details Updated Successfully");
+      else console.log(err);
     }
   );
-  res.send("Updated Successfully");
 });
 
 //For deleting a blog
