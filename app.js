@@ -1,69 +1,88 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const ejs = require('ejs');
-const mongoose = require('mongoose');
-
-const homeStartingContent = "This is the home page of confetti where people can confess something. Please feel free to leave a confession at by hitting compose button right above. Have fun!!!"
+const express = require("express");
+const bodyParser = require("body-parser");
+const ejs = require("ejs");
+const mysql = require("mysql");
 
 const app = express();
 
-app.set('view engine', 'ejs');
+//
+const mysqlConnection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "user",
+  database: "blogdatabase",
+});
+mysqlConnection.connect((err) => {
+  if (err) throw err;
+  console.log("Connected to sql");
+});
+//
 
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+app.set("view engine", "ejs");
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/ConfessionDB", {
-    useNewUrlParser: true
-});
-const postSchema = {
-    title: String,
-    content: String
-};
-const Post = mongoose.model("Post", postSchema);
-
-app.get('/', function (req, res) {
-    Post.find({}, function (err, posts) {
-
-        res.render('home', {
-            startingContent: homeStartingContent,
-            posts: posts
-        });
-    })
-});
-app.get('/compose', function (req, res) {
-    res.render("compose.ejs")
-})
-app.get('/home', function (req, res) {
-    res.render("home.ejs")
+//For creating a blog
+app.post("/addblog", function (req, res) {
+  var sql =
+    "insert into blogs(title, content) values ('title data','content data')";
+  mysqlConnection.query(sql, function (err, rows, fields) {
+    if (err) throw err;
+    console.log("record inserted");
+  });
+  res.send("Added");
 });
 
-app.post('/compose', function (req, res) {
-    const post = new Post({
-        title: req.body.postTitle,
-        content: req.body.postBody
-    });
-
-    post.save(function (err) {
-        if (!err) {
-            res.redirect("/");
-        }
-    });
+//For reading all blogs
+app.get("/blogs", (req, res) => {
+  mysqlConnection.query("select * from blogs", (err, rows, fields) => {
+    if (!err) res.send(rows);
+    else console.log(err);
+  });
 });
 
-app.get('/posts/:postId', function (req, res) {
-    const requestedPostId = req.params.postId;
-    Post.findOne({
-        _id: requestedPostId
-    }, function (err, post) {
-        res.render("post", {
-            title: post.title,
-            content: post.content
-        });
-    });
+//For reading a single blog
+app.get("/blogs/:id", (req, res) => {
+  mysqlConnection.query(
+    "select * from blogs where id=?",
+    [req.params.id],
+    (err, rows, fields) => {
+      if (!err) res.send(rows);
+      else console.log(err);
+    }
+  );
 });
 
-app.listen(3000, function () {
-    console.log("Running on: 3000");
-})
+app.put("/blogs/:id", (req, res) => {
+  var sql = "update blogs set title=?,content=? where id=?"[req.params.id];
+  mysqlConnection.query(
+    sql,
+    [req.body.title, req.body.content],
+    function (err, rows, fields) {
+      if (err) throw err;
+      console.log("record inserted");
+    }
+  );
+  res.send("Updated Successfully");
+});
+
+//For deleting a blog
+app.delete("/blogs/:id", (req, res) => {
+  mysqlConnection.query(
+    "delete from blogs where id=?",
+    [req.params.id],
+    (err, rows, fields) => {
+      if (!err) res.send("Record deleted successfully");
+      else console.log(err);
+    }
+  );
+});
+
+app.listen(3000, () => {
+  console.log("Running on: 3000");
+});
