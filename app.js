@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const ejs = require("ejs");
 const mysql = require("mysql");
 
 const app = express();
@@ -11,6 +10,7 @@ const mysqlConnection = mysql.createConnection({
   user: "root",
   password: "user",
   database: "blogdatabase",
+  multipleStatements: true,
 });
 mysqlConnection.connect((err) => {
   if (err) throw err;
@@ -29,13 +29,22 @@ app.use(express.static("public"));
 
 //For creating a blog
 app.post("/addblog", function (req, res) {
+  let blg = req.body;
   var sql =
-    "insert into blogs(title, content) values ('title data','content data')";
-  mysqlConnection.query(sql, function (err, rows, fields) {
-    if (err) throw err;
-    console.log("record inserted");
-  });
-  res.send("Added");
+    "set @id=?; set @title=?; set @content=?;\
+    call blogAddOrEdit(@id, @title,@content);";
+  mysqlConnection.query(
+    sql,
+    [blg.id, blg.title, blg.content],
+    function (err, rows, fields) {
+      if (!err)
+        rows.array.forEach((element) => {
+          if (element.constructor == Array)
+            res.send("Inserted blog id: " + element[0].id);
+        });
+      else console.log(err);
+    }
+  );
 });
 
 //For reading all blogs
@@ -58,28 +67,17 @@ app.get("/blogs/:id", (req, res) => {
   );
 });
 
-// app.put("/blogs/:id", (req, res) => {
-//   var sql = "update blogs set title=?,content=? where id=?";
-//   mysqlConnection.query(
-//     sql,
-
-//     function (err, rows, fields) {
-//       if (err) throw err;
-//       console.log("record inserted");
-//     }
-//   );
-//   res.send("Updated Successfully");
-// });
-
+//Update Record
 app.put("/blogs", (req, res) => {
-  let blog = req.body;
+  let blg = req.body;
   var sql =
-    "SET @id = ?;SET @title = ?;SET @content = ?; CALL blogEdit(@id,@title,@content);";
+    "set @id=?; set @title=?; set @content=?;\
+    call blogAddOrEdit(@id, @title,@content);";
   mysqlConnection.query(
     sql,
-    [blog.id, blog.title, blog.content],
-    (err, rows, fields) => {
-      if (!err) res.send("Learner Details Updated Successfully");
+    [blg.id, blg.title, blg.content],
+    function (err, rows, fields) {
+      if (!err) res.send("Updated Successfully");
       else console.log(err);
     }
   );
